@@ -17,7 +17,6 @@ const userSchema = new mongoose.Schema({
   updatedAt: Date
 });
 
-
 const likeSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     targetId: { type: mongoose.Schema.Types.ObjectId, refPath: 'targetType' }, // Reference to either a match or a comment
