@@ -19,6 +19,23 @@ app.use((req, res, next) => {
     console.log(req.path, req.method);
     next();
 }) 
+// Centralized error handling middleware
+const errorHandler = (err, req, res, next) => {
+  console.error("Error:", err);
+
+  // Handle specific errors
+  if (err.name === "JsonWebTokenError") {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+  if (err.name === "TokenExpiredError") {
+    return res.status(401).json({ message: "Token expired" });
+  }
+
+  // Generic error response
+  res.status(500).json({ message: "An error occurred" });
+};
+// Apply the error handling middleware
+app.use(errorHandler);
 
 // Connect to the MongoDB database using the MONGO_URI from environment variables
 mongoose.connect(process.env.MONGO_URI, {

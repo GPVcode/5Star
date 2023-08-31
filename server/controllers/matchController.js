@@ -37,6 +37,7 @@ const matchController = {
         res.status(500).json({ message: 'Error presenting match' });
         }
     },
+
     // Controller method to rate a match
     async rateMatch(req, res) {
         const { matchId } = req.params;
@@ -58,7 +59,7 @@ const matchController = {
         console.error('Error rating match:', error);
         res.status(500).json({ message: 'Error rating match' });
         }
-    },
+    }
 }
 
 export default matchController;
