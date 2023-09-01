@@ -3,13 +3,17 @@ import Match from '../models/Match.js';
 const matchController = {
 
     // Controller method to create and present a match (for hosts)
-    async viewAndRateMatches(req, res) {
+    async getMatches(req, res) {
         try {
           // Fetch all matches from the database
-          const matches = await Match.find();
-    
-          // Render a view where users can see and rate matches
-          res.json({ matches });
+          const matches = await Match.find() 
+            .populate('host', 'username') // Populate host's username
+            .populate('likes', 'userId')   // Populate likes' userId
+            .populate('comments', 'userId text createdAt') // Populate comments' userId, text, createdAt
+            .populate('ratings', 'userId rating createdAt'); // Populate ratings' userId, rating, createdAt
+            
+        res.json(matches);
+        
         } catch (error) {
           console.error('Error fetching matches:', error);
           res.status(500).json({ message: 'Internal server error' });

@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use("/", routes);
 app.use('/auth', authRoutes);
-app.use('/match', matchRoutes)
+app.use('/api', matchRoutes)
 // gives idea of api request being called.
 app.use((req, res, next) => {
     console.log(req.path, req.method);

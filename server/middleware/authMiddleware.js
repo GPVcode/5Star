@@ -1,10 +1,11 @@
 import jwt from 'jsonwebtoken';
 import authConfig from '../config/authConfig.js';
+import { invalidatedTokens } from '../routes/authRoutes.js' // importing invalidatedTokens set
 
 const authMiddleware = (req, res, next) => {
     const token = req.header('x-auth-token');
 
-    if(!token){
+    if(!token || invalidatedTokens.has(token)){
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
