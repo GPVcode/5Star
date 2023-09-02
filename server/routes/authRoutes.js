@@ -44,13 +44,14 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials'});
     }
     
-    const isPasswordValid = bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     const payload = {
       user: {
         id: user.id,
+        username: user.username,
       },
     };
 
@@ -61,13 +62,12 @@ router.post('/login', async (req, res) => {
         if (err) {
           reject(err);
         } else {    
-          console.log("here 3")
           resolve(token);
         }
       });
     });
 
-    res.json({ token });
+    res.json({ token, username: user.username });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: 'Error logging in' });

@@ -5,11 +5,12 @@ import morgan from 'morgan';
 import authRoutes from './routes/authRoutes.js';
 import routes from './routes/routes.js';
 import matchRoutes from './routes/matchRoutes.js'
+import cors from 'cors';
 
 dotenv.config();
 const app = express();
 app.use(express.json());
-
+app.use(cors());
 app.use(morgan('dev'));
 app.use("/", routes);
 app.use('/auth', authRoutes);
@@ -19,6 +20,7 @@ app.use((req, res, next) => {
     console.log(req.path, req.method);
     next();
 }) 
+
 // Centralized error handling middleware
 const errorHandler = (err, req, res, next) => {
   console.error("Error:", err);

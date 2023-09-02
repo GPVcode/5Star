@@ -1,24 +1,37 @@
 // Navbar.js
-
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom'
+import { logout } from '../features/auth/authSlice'; // Import the logout action
 import './Navbar.css'; // Import your custom CSS for styling
 
 const Navbar = () => {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const dispatch = useDispatch();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
+  const handleCloseMenu = () => {
+    setMenuOpen(false); // Close the menu when a link is clicked
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    handleCloseMenu(); // close menu after logout
+  };
+
   return (
     <nav className="navigation">
-      <a href="/" className="brand-name">
+      <Link to="/" className="brand-name">
         Banger After Banger
-      </a>
+      </Link>
       <button 
         className="hamburger"
         onClick={() => {
-          setMenuOpen(!menuOpen);
+          toggleMenu();
         }}
       >
         {/* icon from heroicons.com */}
@@ -42,13 +55,20 @@ const Navbar = () => {
         >
         <ul>
           <li>
-            <a href="/home">Home</a>
+            <Link to="/" onClick={handleCloseMenu}>Home</Link>
           </li>
           <li>
-            <a href="/about">About</a>
+            <Link to="/about" onClick={handleCloseMenu}>About</Link>
           </li>
           <li>
-            <a href="/contact">Contact</a>
+            <Link to="/contact" onClick={handleCloseMenu}>Contact</Link>
+          </li>
+          <li>
+            {isAuthenticated ? (    
+              <button className="logout-button" onClick={handleLogout}>Logout</button> // Render logout
+            ) : (
+              <Link to="/login" onClick={handleCloseMenu}>Start</Link>
+            )}
           </li>
         </ul>
       </div>
