@@ -13,7 +13,12 @@ export const login = createAsyncThunk('auth/login', async (credentials, { reject
   
       if (response.ok) {
         const userData = await response.json();
-        dispatch({ type: 'AUTH_SUCCESS', payload: userData }); // Include 'username' in 'userData'
+
+        // Store both the token and user data in localStorage
+        localStorage.setItem('token', userData.token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        dispatch(setUser(userData)); // Include 'username' in 'userData'
+        console.log("userData: ", userData)
 
         return userData;
       } else {
@@ -24,6 +29,15 @@ export const login = createAsyncThunk('auth/login', async (credentials, { reject
       return rejectWithValue('Error: ' + error.message);
     }
   });
+
+  const isTokenValid = () => {
+    const token = localStorage.getItem('token');
+    if(!token) return false;
+
+    return true
+  };
+
+  const initialUser = JSON.parse(localStorage.getItem('user'));
 
   export const register = createAsyncThunk('auth/register', async (userData, { rejectWithValue, dispatch }) => {
     try{ 
@@ -37,7 +51,7 @@ export const login = createAsyncThunk('auth/login', async (credentials, { reject
 
       if(response.ok){
         const newUser = await response.json();
-        dispatch({ type: 'AUTH_SUCCESS', payload: newUser });
+        dispatch(setUser(newUser)); // Use setUser action to set user data
 
         return newUser;
       } else {
@@ -50,19 +64,31 @@ export const login = createAsyncThunk('auth/login', async (credentials, { reject
     }
   });
 
+  
+
 // create slice for authentication
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
-        isAuthenticated: false,
-        user: null,
+        isAuthenticated: isTokenValid(),
+        user: initialUser,
         loading: false,
         error: null,
     },
     reducers: {
+        setUser: (state, action) => {
+          state.isAuthenticated = true;
+          state.user = action.payload;
+        },
+        clearUser: (state) => {
+          state.isAuthenticated = false;
+          state.user = null;
+        },
         logout: (state) => {
           state.isAuthenticated = false;
           state.user = null;
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
         },
         clearError: (state) => {
           state.error = null;
@@ -86,5 +112,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout, clearError, setUser, clearUser } = authSlice.actions;
 export default authSlice.reducer;

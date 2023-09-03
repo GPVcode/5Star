@@ -11,6 +11,8 @@ const Register = () => {
     const error = useSelector((state) => state.auth.error);
     const navigate = useNavigate();
 
+    const [ registrationSuccess, setRegistrationSuccess ] = useState(false);
+
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -31,7 +33,8 @@ const Register = () => {
 
         try{
             dispatch(register({ username, email, password }));
-            navigate('/login')
+            setRegistrationSuccess(true);
+            navigate('/login');
         } catch (error){
             console.error('Error: ', error)
         }
@@ -84,6 +87,9 @@ const Register = () => {
                 <button type="submit" className="login-button">
                     {isLoading ? "Registering..." : "Register"}
                 </button>
+
+                {registrationSuccess && <p className="success-message">Registration successful! You can now log in.</p>}
+
                 {error && <p className="error-message">{error}</p>}
                 {!isLoading && (
                     <div className="register-section">

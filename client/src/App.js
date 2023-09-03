@@ -6,6 +6,7 @@ import Login from './features/auth/LoginPage.js';
 import Register from './features/auth/RegisterPage.js';
 
 const App = () => {
+
   return (
     <Router>
       <Navbar />

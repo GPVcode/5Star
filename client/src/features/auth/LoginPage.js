@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from "./authSlice";
+import { login, clearError,setUser } from "./authSlice";
 import { Link, useNavigate } from 'react-router-dom';
-import { clearError } from './authSlice';
 import './Login.css';
 
 const Login = () => {
@@ -32,9 +31,6 @@ const Login = () => {
 
         try{
             dispatch(login({ email, password }));
-            if(isAuthenticated) {
-                navigate('/');
-            }
         } catch (error){
             console.error('Error: ', error)
         }
@@ -43,6 +39,20 @@ const Login = () => {
     const handleRegisterClick = () => {
         dispatch(clearError());
     }
+
+    const handleGoogleSignIn = () => {
+        // Redirect the user to your server's Google OAuth route
+        window.location.href = 'http://localhost:2239/oauth/google';
+    };
+
+    // Check if the user is authenticated and redirect
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/');
+        }
+    }, [isAuthenticated, navigate]);
+
+
 
     return (
         <div className="login-container">
@@ -82,9 +92,6 @@ const Login = () => {
                         Login successful!
                     </div>
                 )}
-                <div className="forgot-password">
-                    <Link to="/forgot-password">Forgot password?</Link>
-                </div>
                 
                 {error && <p className="error-message">{error}</p>}
                 {!isLoading && (
@@ -95,6 +102,14 @@ const Login = () => {
                         </Link>
                     </div>
                 )}
+                <div className="forgot-password">
+                    <Link to="/forgot-password">Forgot password?</Link>
+                </div>
+
+                 {/* Add the Google sign-in button */}
+                 <button type="button" className="google-sign-in-button" onClick={handleGoogleSignIn}>
+                    Sign in with Google
+                </button>
             </form>
            
         </div>
