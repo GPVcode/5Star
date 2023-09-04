@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { login, clearError,setUser } from "./authSlice";
+import { login, clearError } from "./authSlice";
 import { Link, useNavigate } from 'react-router-dom';
 import './Login.css';
 
 const Login = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
     const isLoading = useSelector((state) => state.auth.loading);
     const error = useSelector((state) => state.auth.error);
@@ -17,7 +19,6 @@ const Login = () => {
 
     const { email, password } = formData;
 
-    const navigate = useNavigate();
     
     const handleInputChange = (e) => {
         setFormData({

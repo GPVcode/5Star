@@ -10,6 +10,7 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import models from './models/User.js';
 import session from 'express-session';
+import axios from 'axios';
 import generateToken from './config/generateToken.js';
 
 dotenv.config();
@@ -105,16 +106,39 @@ app.get('/oauth/google',
 app.get('/oauth/google/callback',
   passport.authenticate('google', { 
     failureRedirect: '/login'
-  }), (req, res) => {
-    req.logIn(req.user, async (err) => {
-      if(err){
-        console.error(err);
-        return res.redirect('/login');
-      }    
+  }), async (req, res) => {
+    try {
+      const code = req.query.code; // The authorization code from Google
+      // Exchange the code for an access token using a library like `axios`
+      const response = await axios.post('https://oauth2.googleapis.com/token', {
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: 'http://localhost:2239/oauth/google/callback',
+        grant_type: 'authorization_code',
+      });
+      console.log("Google OAuth Response:", response.data);
 
-      const token = generateToken(req.user)
-      res.redirect(`http://localhost:3000/?token=${token}`);
-    });
+      const { access_token } = response.data;
+
+      // Use the `access_token` to fetch user data from Google
+      const userDataResponse = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      });
+
+      const userData = userDataResponse.data;
+
+      // Generate your application's token and send it to the client
+      const appToken = generateToken(userData);
+
+      // Redirect the client to your application's route with the token
+      res.redirect(`http://localhost:3000/?token=${appToken}`);
+    } catch (error) {
+      console.error('Google OAuth Request Error:', error.message);
+      res.redirect('/login'); // Redirect to login page on error
+    }
   }
 );
 
